@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { Web3 } from "web3";
+import contractData from '../contracts/PatientManagement.json';
+const AddPatients = ({ myContract, connectedAcc }) => {
+    // console.log(myContract);
 
-const AddPatients = () => {
     const bangladeshDistricts = [
         "Bagerhat",
         "Bandarban",
@@ -73,12 +76,40 @@ const AddPatients = () => {
         handleSubmit,
         formState: { errors },
     } = useForm();
+    //######ADD PATIENTS########
     const onSubmit = data => {
-        console.log(data);
+        // console.log(data);
+        myContract.methods.addPatient(
+            data.add,
+            data.age,
+            data.gender,
+            data.vaccineStatus,
+            data.district,
+            data.symptoms
+        ).send({ from: connectedAcc || "", gas: 6000000 })
+            .then(() => {
+                console.log("PATIENT ADDED");
+            })
+            .catch((err) => {
+                console.error(err.message);
+            })
+
     }
+    const [value, setValue] = useState({});
+    const getValue = async (myContract, connectedAcc) => {
+        try {
+            const result = await myContract.methods.getPatientById(1).call(); // Call your view function
+            console.log(result);
+            // Update state with the result
+        } catch (error) {
+            console.error('Error:', error);
+        }
+
+    }
+
     return (
         <div className='shadow-lg p-10'>
-            <h1 className='text-primary font-semibold text-center'>ADD PATIENT</h1>
+            <h1 className='text-primary font-semibold text-center text-l'>ADD PATIENT</h1>
             <div className='w-full flex justify-center align-middle'>
                 <form className='flex flex-col justify-between' onSubmit={handleSubmit(onSubmit)}>
 
@@ -94,13 +125,18 @@ const AddPatients = () => {
                                 required: {
                                     value: true,
                                     message: 'Address is Required'
+                                },
+                                pattern: {
+                                    value: /^(0x)?[0-9a-fA-F]{40}$/,
+                                    message: 'Invalid Ethereum address'
                                 }
                             })}
                         />
                         <label className="label">
-                            {errors.brand?.type === 'required' && <span className="label-text-alt text-red-500">{errors.brand?.message}</span>}
+                            {errors.add?.type === 'required' && <span className="label-text-alt text-red-500">{errors.add?.message}</span>}
                         </label>
                     </div>
+
                     <div className="form-control w-full max-w-xs mb-4">
                         <label className="label my-2">
                             <span className="label-text">Age</span>
@@ -109,15 +145,17 @@ const AddPatients = () => {
                             type="number"
                             placeholder="Age"
                             className="input input-bordered w-full max-w-xs"
-                            {...register("age", { min: 1, max: 129 }, {
+                            {...register("age", {
                                 required: {
                                     value: true,
                                     message: 'Age is Required'
-                                }
+                                },
+                                min: { value: 1, message: 'Age must be at least 1' },
+                                max: { value: 130, message: 'Age must be at most 130' }
                             })}
                         />
                         <label className="label">
-                            {errors.model?.type === 'required' && <span className="label-text-alt text-red-500">{errors.model?.message}</span>}
+                            {errors.age?.type === 'required' && <span className="label-text-alt text-red-500">{errors.age?.message}</span>}
                         </label>
                     </div>
                     <div className="form-control w-full max-w-xs mb-4">
@@ -138,7 +176,7 @@ const AddPatients = () => {
                             }
                         </select>
                         <label className="label">
-                            {errors.type?.type === 'required' && <span className="label-text-alt text-red-500">{errors.type?.message}</span>}
+                            {errors.district?.type === 'required' && <span className="label-text-alt text-red-500">{errors.district?.message}</span>}
                         </label>
                     </div>
                     <div className="form-control w-full max-w-xs mb-4">
@@ -157,7 +195,26 @@ const AddPatients = () => {
                             <option value='others'>Others</option>
                         </select>
                         <label className="label">
-                            {errors.type?.type === 'required' && <span className="label-text-alt text-red-500">{errors.type?.message}</span>}
+                            {errors.gender?.type === 'required' && <span className="label-text-alt text-red-500">{errors.gender?.message}</span>}
+                        </label>
+                    </div>
+                    <div className="form-control w-full max-w-xs mb-4">
+                        <label className="label my-2">
+                            <span className="label-text">Symptoms</span>
+                        </label>
+                        <textarea
+                            type="text"
+                            placeholder="Symptoms"
+                            className="input input-bordered w-full max-w-xs"
+                            {...register("symptoms", {
+                                required: {
+                                    value: true,
+                                    message: 'Symptoms is Required'
+                                }
+                            })}
+                        />
+                        <label className="label">
+                            {errors.symptoms?.type === 'required' && <span className="label-text-alt text-red-500">{errors.symptoms?.message}</span>}
                         </label>
                     </div>
                     <div className="form-control w-full max-w-xs mb-4">
@@ -171,15 +228,16 @@ const AddPatients = () => {
                                     message: 'Vaccine Status is Required'
                                 }
                             })}>
-                            <option value='not_vaccinated'>Not Vaccinated</option>
-                            <option value='one_dose'>One Dose</option>
-                            <option value='two_dose'>Two Dose</option>
+                            <option value={0} >Not Vaccinated</option>
+                            <option value={1}>One Dose</option>
+                            <option value={2}>Two Dose</option>
                         </select>
                         <label className="label">
-                            {errors.type?.type === 'required' && <span className="label-text-alt text-red-500">{errors.type?.message}</span>}
+                            {errors.vaccineStatus?.type === 'required' && <span className="label-text-alt text-red-500">{errors.vaccineStatus?.message}</span>}
                         </label>
                     </div>
-                    <input className='btn btn-slate-400 w-full max-w-xs' type="submit" value="SUBMIT" />
+                    <input className='bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded w-full max-w-xs' type="submit" value="SUBMIT" />
+                    <button onClick={() => getValue(myContract, connectedAcc)}>Get Value</button>
                 </form>
             </div>
         </div>

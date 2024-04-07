@@ -94,11 +94,15 @@ const AddAdmin = () => {
                                 required: {
                                     value: true,
                                     message: 'Address is Required'
+                                },
+                                pattern: {
+                                    value: /^(0x)?[0-9a-fA-F]{40}$/,
+                                    message: 'Invalid Ethereum address'
                                 }
                             })}
                         />
                         <label className="label">
-                            {errors.brand?.type === 'required' && <span className="label-text-alt text-red-500">{errors.brand?.message}</span>}
+                            {errors.add?.type === 'required' && <span className="label-text-alt text-red-500">{errors.add?.message}</span>}
                         </label>
                     </div>
                     <div className="form-control w-full max-w-xs mb-4">
@@ -109,15 +113,17 @@ const AddAdmin = () => {
                             type="number"
                             placeholder="Age"
                             className="input input-bordered w-full max-w-xs"
-                            {...register("age", { min: 1, max: 129 }, {
+                            {...register("age", {
                                 required: {
                                     value: true,
                                     message: 'Age is Required'
-                                }
+                                },
+                                min: { value: 1, message: 'Age must be at least 1' },
+                                max: { value: 130, message: 'Age must be at most 130' }
                             })}
                         />
                         <label className="label">
-                            {errors.model?.type === 'required' && <span className="label-text-alt text-red-500">{errors.model?.message}</span>}
+                            {errors.age?.type === 'required' && <span className="label-text-alt text-red-500">{errors.age?.message}</span>}
                         </label>
                     </div>
                     <div className="form-control w-full max-w-xs mb-4">
@@ -138,7 +144,7 @@ const AddAdmin = () => {
                             }
                         </select>
                         <label className="label">
-                            {errors.type?.type === 'required' && <span className="label-text-alt text-red-500">{errors.type?.message}</span>}
+                            {errors.district?.type === 'required' && <span className="label-text-alt text-red-500">{errors.district?.message}</span>}
                         </label>
                     </div>
                     <div className="form-control w-full max-w-xs mb-4">
@@ -157,7 +163,7 @@ const AddAdmin = () => {
                             <option value='others'>Others</option>
                         </select>
                         <label className="label">
-                            {errors.type?.type === 'required' && <span className="label-text-alt text-red-500">{errors.type?.message}</span>}
+                            {errors.gender?.type === 'required' && <span className="label-text-alt text-red-500">{errors.gender?.message}</span>}
                         </label>
                     </div>
                     <div className="form-control w-full max-w-xs mb-4">
@@ -176,7 +182,7 @@ const AddAdmin = () => {
                             <option value='two_dose'>Two Dose</option>
                         </select>
                         <label className="label">
-                            {errors.type?.type === 'required' && <span className="label-text-alt text-red-500">{errors.type?.message}</span>}
+                            {errors.vaccineStatus?.type === 'required' && <span className="label-text-alt text-red-500">{errors.vaccineStatus?.message}</span>}
                         </label>
                     </div>
                     <input className='btn btn-slate-400 w-full max-w-xs' type="submit" value="SUBMIT" />

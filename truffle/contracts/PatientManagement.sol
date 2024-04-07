@@ -31,6 +31,7 @@ contract PatientManagement {
     mapping(string => uint256[]) public districtDeath;
     mapping(string => uint256[]) public districtPatient;
     mapping(uint256 => Person) public idToPerson;
+    mapping(address => Person) public addressToPerson;
     mapping(string => uint256) public ageGroupCount;
     uint256 public patientCount;
     uint256 public adminCount;
@@ -97,6 +98,17 @@ contract PatientManagement {
             false,
             false
         );
+        addressToPerson[_add] = Person(
+            _add,
+            patientCount,
+            _age,
+            _gender,
+            _vaccineStatus,
+            _district,
+            _symptomsDetails,
+            false,
+            false
+        );
         if (_age < 13) {
             ageGroupCount["children"] += 1;
         } else if (_age >= 13 && _age < 20) {
@@ -136,6 +148,11 @@ contract PatientManagement {
 
     function getPatientById(uint256 _id) public view returns (Person memory) {
         return idToPerson[_id];
+    }
+    function getPatientByAddress(
+        address _add
+    ) public view returns (Person memory) {
+        return addressToPerson[_add];
     }
 
     function getPatientByDistrict(
