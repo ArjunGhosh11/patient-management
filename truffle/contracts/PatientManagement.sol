@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: GPL-3.0
-pragma solidity >=0.7.0 <0.9.0;
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.16;
 
 error NotAdmin();
 
@@ -13,6 +14,7 @@ contract PatientManagement {
     }
 
     struct Person {
+        address add;
         uint256 id;
         uint256 age;
         string gender;
@@ -29,6 +31,7 @@ contract PatientManagement {
     mapping(string => uint256[]) public districtDeath;
     mapping(string => uint256[]) public districtPatient;
     mapping(uint256 => Person) public idToPerson;
+    mapping(string => uint256) public ageGroupCount;
     uint256 public patientCount;
     uint256 public adminCount;
 
@@ -38,6 +41,7 @@ contract PatientManagement {
         adminCount = 0;
         List_Of_Admins.push(adminCount);
         idToPerson[patientCount] = Person(
+            i_admin,
             patientCount,
             23,
             "male",
@@ -51,7 +55,6 @@ contract PatientManagement {
     function getAddress() public view returns (address) {
         return i_admin;
     }
-
     function quickSort(uint256[] memory arr, int256 left, int256 right) public {
         int256 i = left;
         int256 j = right;
@@ -74,6 +77,7 @@ contract PatientManagement {
     }
 
     function addPatient(
+        address _add,
         uint256 _age,
         string memory _gender,
         VaccineStatus _vaccineStatus,
@@ -83,6 +87,7 @@ contract PatientManagement {
         patientCount++;
         List_Of_Patients.push(patientCount);
         idToPerson[patientCount] = Person(
+            _add,
             patientCount,
             _age,
             _gender,
@@ -92,11 +97,21 @@ contract PatientManagement {
             false,
             false
         );
+        if (_age < 13) {
+            ageGroupCount["children"] += 1;
+        } else if (_age >= 13 && _age < 20) {
+            ageGroupCount["teenager"] += 1;
+        } else if (_age >= 20 && _age < 50) {
+            ageGroupCount["young"] += 1;
+        } else {
+            ageGroupCount["elder"] += 1;
+        }
         districtPatient[_district].push(patientCount);
         return patientCount;
     }
 
     function addAdmin(
+        address _add,
         uint256 _age,
         string memory _gender,
         VaccineStatus _vaccineStatus,
@@ -106,6 +121,7 @@ contract PatientManagement {
         adminCount++;
         List_Of_Admins.push(patientCount);
         idToPerson[patientCount] = Person(
+            _add,
             patientCount,
             _age,
             _gender,
