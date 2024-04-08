@@ -25,9 +25,9 @@ contract PatientManagement {
         bool is_admin;
     }
 
-    uint256[] public List_Of_Patients;
-    uint256[] public List_Of_Admins;
-    uint256[] public deceasedPeople;
+    address[] public List_Of_Patients;
+    address[] public List_Of_Admins;
+    address[] public deceasedPeople;
     mapping(string => uint256[]) public districtDeath;
     mapping(string => uint256[]) public districtPatient;
     mapping(uint256 => Person) public idToPerson;
@@ -40,8 +40,19 @@ contract PatientManagement {
         i_admin = msg.sender;
         patientCount = 0;
         adminCount = 0;
-        List_Of_Admins.push(adminCount);
+        List_Of_Admins.push(i_admin);
         idToPerson[patientCount] = Person(
+            i_admin,
+            patientCount,
+            23,
+            "male",
+            VaccineStatus.two_dose,
+            "Tangail",
+            "No SYmptoms",
+            false,
+            true
+        );
+        addressToPerson[i_admin] = Person(
             i_admin,
             patientCount,
             23,
@@ -86,7 +97,7 @@ contract PatientManagement {
         string memory _symptomsDetails
     ) public returns (uint256) {
         patientCount++;
-        List_Of_Patients.push(patientCount);
+        List_Of_Patients.push(_add);
         idToPerson[patientCount] = Person(
             _add,
             patientCount,
@@ -131,7 +142,7 @@ contract PatientManagement {
         string memory _symptomsDetails
     ) public onlyadmin returns (uint256) {
         adminCount++;
-        List_Of_Admins.push(patientCount);
+        List_Of_Admins.push(_add);
         idToPerson[patientCount] = Person(
             _add,
             patientCount,
@@ -181,12 +192,14 @@ contract PatientManagement {
         }
     }
 
-    function issueDeathCertificate(uint256 _id) public onlyadmin {
+    function issueDeathCertificate(address _add) public onlyadmin {
         // Check if the person exists
         // Update the person's status in the mapping
-        idToPerson[_id].is_dead = true;
-        districtDeath[idToPerson[_id].district].push(_id);
-        deceasedPeople.push(_id);
+        addressToPerson[_add].is_dead = true;
+        districtDeath[addressToPerson[_add].district].push(
+            addressToPerson[_add].id
+        );
+        deceasedPeople.push(_add);
     }
 
     modifier onlyadmin() {

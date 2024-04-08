@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Web3 } from "web3";
-import contractData from '../contracts/PatientManagement.json';
+
 const AddPatients = ({ myContract, connectedAcc }) => {
     // console.log(myContract);
 
@@ -108,7 +107,7 @@ const AddPatients = ({ myContract, connectedAcc }) => {
     }
 
     return (
-        <div className='shadow-lg p-10'>
+        <div className='shadow-xl p-10 bg-slate-500'>
             <h1 className='text-primary font-semibold text-center text-l'>ADD PATIENT</h1>
             <div className='w-full flex justify-center align-middle'>
                 <form className='flex flex-col justify-between' onSubmit={handleSubmit(onSubmit)}>

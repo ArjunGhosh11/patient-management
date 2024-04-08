@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-const AddAdmin = () => {
+const AddAdmin = ({ myContract, connectedAcc }) => {
     const bangladeshDistricts = [
         "Bagerhat",
         "Bandarban",
@@ -73,11 +73,38 @@ const AddAdmin = () => {
         handleSubmit,
         formState: { errors },
     } = useForm();
+    //######ADD ADMINS########
     const onSubmit = data => {
-        console.log(data);
+        // console.log(data);
+        myContract.methods.addAdmin(
+            data.add,
+            data.age,
+            data.gender,
+            data.vaccineStatus,
+            data.district,
+            data.symptoms
+        ).send({ from: connectedAcc || "", gas: 6000000 })
+            .then(() => {
+                console.log("PATIENT ADDED");
+            })
+            .catch((err) => {
+                console.error(err.message);
+            })
+
     }
+    // const [value, setValue] = useState({});
+    // const getValue = async (myContract, connectedAcc) => {
+    //     try {
+    //         const result = await myContract.methods.getPatientById(1).call(); // Call your view function
+    //         console.log(result);
+    //         // Update state with the result
+    //     } catch (error) {
+    //         console.error('Error:', error);
+    //     }
+
+    // }
     return (
-        <div className='shadow-lg p-10'>
+        <div className='shadow-xl p-10'>
             <h1 className='text-primary font-semibold text-center'>ADD ADMIN</h1>
             <div className='w-full flex justify-center align-middle'>
                 <form className='flex flex-col justify-between' onSubmit={handleSubmit(onSubmit)}>
@@ -89,7 +116,7 @@ const AddAdmin = () => {
                         <input
                             type="text"
                             placeholder="Wallet Address"
-                            className="input input-bordered w-full max-w-xs"
+                            className="input input-bordered w-full max-w-xs p-2 rounded-lg mt-3"
                             {...register("add", {
                                 required: {
                                     value: true,
@@ -105,6 +132,7 @@ const AddAdmin = () => {
                             {errors.add?.type === 'required' && <span className="label-text-alt text-red-500">{errors.add?.message}</span>}
                         </label>
                     </div>
+
                     <div className="form-control w-full max-w-xs mb-4">
                         <label className="label my-2">
                             <span className="label-text">Age</span>
@@ -112,7 +140,7 @@ const AddAdmin = () => {
                         <input
                             type="number"
                             placeholder="Age"
-                            className="input input-bordered w-full max-w-xs"
+                            className="input input-bordered w-full max-w-xs p-2 rounded-lg mt-3"
                             {...register("age", {
                                 required: {
                                     value: true,
@@ -130,7 +158,7 @@ const AddAdmin = () => {
                         <label className="label mr-5">
                             <span className="label-text">District</span>
                         </label>
-                        <select defaultValue='Dhaka' className="select select-bordered"
+                        <select defaultValue='Dhaka' className="select select-bordered p-2 rounded-lg mt-3"
                             {...register("district", {
                                 required: {
                                     value: true,
@@ -151,7 +179,7 @@ const AddAdmin = () => {
                         <label className="label mr-5">
                             <span className="label-text">Gender</span>
                         </label>
-                        <select defaultValue='Male' className="select select-bordered"
+                        <select defaultValue='Male' className="select select-bordered p-2 rounded-lg mt-3"
                             {...register("gender", {
                                 required: {
                                     value: true,
@@ -167,25 +195,44 @@ const AddAdmin = () => {
                         </label>
                     </div>
                     <div className="form-control w-full max-w-xs mb-4">
+                        <label className="label my-2">
+                            <span className="label-text">Symptoms</span>
+                        </label>
+                        <textarea
+                            type="text"
+                            placeholder="Symptoms"
+                            className="input input-bordered w-full max-w-xs p-2 rounded-lg mt-3"
+                            {...register("symptoms", {
+                                required: {
+                                    value: true,
+                                    message: 'Symptoms is Required'
+                                }
+                            })}
+                        />
+                        <label className="label">
+                            {errors.symptoms?.type === 'required' && <span className="label-text-alt text-red-500">{errors.symptoms?.message}</span>}
+                        </label>
+                    </div>
+                    <div className="form-control w-full max-w-xs mb-4">
                         <label className="label mr-5">
                             <span className="label-text">Vaccine Status</span>
                         </label>
-                        <select defaultValue='None' className="select select-bordered"
+                        <select defaultValue='None' className="select select-bordered p-2 rounded-lg mt-3"
                             {...register("vaccineStatus", {
                                 required: {
                                     value: true,
                                     message: 'Vaccine Status is Required'
                                 }
                             })}>
-                            <option value='not_vaccinated'>Not Vaccinated</option>
-                            <option value='one_dose'>One Dose</option>
-                            <option value='two_dose'>Two Dose</option>
+                            <option value={0} >Not Vaccinated</option>
+                            <option value={1}>One Dose</option>
+                            <option value={2}>Two Dose</option>
                         </select>
                         <label className="label">
                             {errors.vaccineStatus?.type === 'required' && <span className="label-text-alt text-red-500">{errors.vaccineStatus?.message}</span>}
                         </label>
                     </div>
-                    <input className='btn btn-slate-400 w-full max-w-xs' type="submit" value="SUBMIT" />
+                    <input className='bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded w-full max-w-xs' type="submit" value="SUBMIT" />
                 </form>
             </div>
         </div>
