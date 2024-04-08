@@ -26,7 +26,6 @@ const Home = () => {
     })
     const toggleState = (state, setState) => {
         setState(!state);
-        console.log(state);
     };
     //#########CONNECTING TO METAMASK########
     async function connectMetamask() {
@@ -46,14 +45,26 @@ const Home = () => {
             //show the first connected account in the react page
             setConnectedAcc(accounts[0]);
             setIsConnected(true);
+            // const user = await myContract.methods.getUserByAddress(accounts[0]).call();
+            // setUserInfo(user);
+            // console.log(userInfo);
         } else {
             alert("Please download metamask");
         }
     }
-    //GETTING THE CONNECTED USER'S INFO
-    const getUserInfo = () => {
 
+    const getUserInfo = async () => {
+        const result = (await myContract.methods.getUserByAddress(connectedAcc).call());
+        return result;
     }
+
+    useEffect(() => {
+        getUserInfo().then((result) => {
+            setUserInfo(result);
+            console.log("User=", result)
+        })
+    }, [connectedAcc]);
+
 
     return (
         <div className='px-20 w-full  align-middle flex flex-col text-dark'>
@@ -65,6 +76,7 @@ const Home = () => {
                 {/* <h1 className='font-bold mb-10 text-sm'>
                     Owner's Address: {address}</h1> */}
                 <h1 className="text-md font-semibold">Connected Account: {connectedAcc}</h1>
+
                 <div className='flex justify-between my-5'>
                     <button
                         className='bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded'
@@ -79,7 +91,7 @@ const Home = () => {
                     {
                         (!registerToggle && connectedAcc) ?
                             <button onClick={() => toggleState(registerToggle, setRegisterToggle)} className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full w-50'>
-                                Register as Patient
+                                Register a Patient
                             </button> :
                             connectedAcc ?
                                 <button onClick={() => toggleState(registerToggle, setRegisterToggle)} className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full w-50'>
@@ -95,6 +107,18 @@ const Home = () => {
                         :
                         <h1></h1>
                 }
+                {
+                    !userInfo?.is_admin && isConnected ?
+                        <div className='w-60 shadow-xl rounded-xl p-5'>
+                            <h1 className='text-sm my-2'><span className='font-bold'>ID: </span>{userInfo?.id}</h1>
+                            <h1 className='text-sm my-2'><span className='font-bold'>AGE: </span>{userInfo?.age}</h1>
+                            <h1 className='text-sm my-2'><span className='font-bold'>GENDER: </span>{userInfo?.gender}</h1>
+                            <h1 className='text-sm my-2'><span className='font-bold'>Vaccine Status: </span>{userInfo?.vaccine_status}</h1>
+                            <h1 className='text-sm my-2'><span className='font-bold'>SYMPTOMS: </span>{userInfo?.symptoms_details}</h1>
+                            <h1 className='text-sm my-2'><span className='font-bold'>STATUS: </span>{userInfo?.is_dead ? "Download Death Certificate" : "NOT DEAD"}</h1>
+                        </div> :
+                        <p></p>
+                }
             </div>
             {/* COVID TREND SECTION */}
             <div>
@@ -103,10 +127,17 @@ const Home = () => {
             {/* 
             ADMIN's UPDATE SECTION
             */}
-            <div>
-                <AdminDashboard myContract={myContract}
-                    connectedAcc={connectedAcc}></AdminDashboard>
-            </div>
+            {
+                userInfo?.is_admin ?
+                    <div>
+                        <AdminDashboard myContract={myContract}
+                            connectedAcc={connectedAcc}></AdminDashboard>
+                    </div> :
+                    <div>
+                        <h1 className='font-bold text-center'>........</h1>
+                    </div>
+            }
+
         </div>
     );
 };
