@@ -4,6 +4,7 @@ import Web3 from 'web3';
 import '../App.css';
 import AddPatients from './AddPatients';
 import AdminDashboard from './AdminDashboard';
+import CovidTrends from './CovidTrends/CovidTrends';
 
 const Home = () => {
     const [isConnected, setIsConnected] = useState(false);
@@ -12,7 +13,7 @@ const Home = () => {
     const [address, setAddress] = useState("");
     const web3 = new Web3('http://localhost:7545');
     const myContract = new web3.eth.Contract(contractData.abi, contractData.networks[5777].address);
-
+    const [userInfo, setUserInfo] = useState();
     //#####GETTING OWNERS ADDRESS########
     const getOwnerAddress = async () => {
         const result = (await myContract.methods.getAddress().call());
@@ -49,7 +50,10 @@ const Home = () => {
             alert("Please download metamask");
         }
     }
+    //GETTING THE CONNECTED USER'S INFO
+    const getUserInfo = () => {
 
+    }
 
     return (
         <div className='px-20 w-full  align-middle flex flex-col text-dark'>
@@ -57,7 +61,7 @@ const Home = () => {
             {/* 
             ACCOUNT CONNECTION SECTION
             */}
-            <div className=''>
+            <div className='mb-10'>
                 {/* <h1 className='font-bold mb-10 text-sm'>
                     Owner's Address: {address}</h1> */}
                 <h1 className="text-md font-semibold">Connected Account: {connectedAcc}</h1>
@@ -84,13 +88,17 @@ const Home = () => {
                                 <h1></h1>
 
                     }
-                </div>
+                </div >
                 {
                     registerToggle ?
                         <AddPatients myContract={myContract} connectedAcc={connectedAcc}></AddPatients>
                         :
                         <h1></h1>
                 }
+            </div>
+            {/* COVID TREND SECTION */}
+            <div>
+                <CovidTrends></CovidTrends>
             </div>
             {/* 
             ADMIN's UPDATE SECTION

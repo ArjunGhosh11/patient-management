@@ -72,6 +72,7 @@ const AddAdmin = ({ myContract, connectedAcc }) => {
         register,
         handleSubmit,
         formState: { errors },
+        reset
     } = useForm();
     //######ADD ADMINS########
     const onSubmit = data => {
@@ -85,7 +86,8 @@ const AddAdmin = ({ myContract, connectedAcc }) => {
             data.symptoms
         ).send({ from: connectedAcc || "", gas: 6000000 })
             .then(() => {
-                console.log("PATIENT ADDED");
+                console.log("ADMIN ADDED");
+                reset();
             })
             .catch((err) => {
                 console.error(err.message);

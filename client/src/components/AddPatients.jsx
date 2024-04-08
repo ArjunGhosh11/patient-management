@@ -74,6 +74,7 @@ const AddPatients = ({ myContract, connectedAcc }) => {
         register,
         handleSubmit,
         formState: { errors },
+        reset
     } = useForm();
     //######ADD PATIENTS########
     const onSubmit = data => {
@@ -88,6 +89,7 @@ const AddPatients = ({ myContract, connectedAcc }) => {
         ).send({ from: connectedAcc || "", gas: 6000000 })
             .then(() => {
                 console.log("PATIENT ADDED");
+                reset();
             })
             .catch((err) => {
                 console.error(err.message);
@@ -97,7 +99,7 @@ const AddPatients = ({ myContract, connectedAcc }) => {
     const [value, setValue] = useState({});
     const getValue = async (myContract, connectedAcc) => {
         try {
-            const result = await myContract.methods.getPatientById(1).call(); // Call your view function
+            const result = await myContract.methods.getUserByAddress("0xA4DD406D79933459fF762920Da0742f5BEAe0340").call(); // Call your view function
             console.log(result);
             // Update state with the result
         } catch (error) {
@@ -107,9 +109,9 @@ const AddPatients = ({ myContract, connectedAcc }) => {
     }
 
     return (
-        <div className='shadow-xl p-10 bg-slate-500'>
-            <h1 className='text-primary font-semibold text-center text-l'>ADD PATIENT</h1>
-            <div className='w-full flex justify-center align-middle'>
+        <div className='bg-slate-100 shadow-xl rounded-xl p-10 lg:mx-40'>
+            <h1 className='text-primary font-semibold text-center text-xl'>ADD PATIENT</h1>
+            <div className='w-full flex justify-center align-middle '>
                 <form className='flex flex-col justify-between' onSubmit={handleSubmit(onSubmit)}>
 
                     <div className="form-control w-full max-w-xs mb-4">
@@ -119,7 +121,7 @@ const AddPatients = ({ myContract, connectedAcc }) => {
                         <input
                             type="text"
                             placeholder="Wallet Address"
-                            className="input input-bordered w-full max-w-xs"
+                            className="input input-bordered w-full max-w-xs p-2 rounded-lg mt-3"
                             {...register("add", {
                                 required: {
                                     value: true,
@@ -143,7 +145,7 @@ const AddPatients = ({ myContract, connectedAcc }) => {
                         <input
                             type="number"
                             placeholder="Age"
-                            className="input input-bordered w-full max-w-xs"
+                            className="input input-bordered w-full max-w-xs p-2 rounded-lg mt-3"
                             {...register("age", {
                                 required: {
                                     value: true,
@@ -161,7 +163,7 @@ const AddPatients = ({ myContract, connectedAcc }) => {
                         <label className="label mr-5">
                             <span className="label-text">District</span>
                         </label>
-                        <select defaultValue='Dhaka' className="select select-bordered"
+                        <select defaultValue='Dhaka' className="select select-bordered p-2 rounded-lg mt-3"
                             {...register("district", {
                                 required: {
                                     value: true,
@@ -182,7 +184,7 @@ const AddPatients = ({ myContract, connectedAcc }) => {
                         <label className="label mr-5">
                             <span className="label-text">Gender</span>
                         </label>
-                        <select defaultValue='Male' className="select select-bordered"
+                        <select defaultValue='Male' className="select select-bordered p-2 rounded-lg mt-3"
                             {...register("gender", {
                                 required: {
                                     value: true,
@@ -204,7 +206,7 @@ const AddPatients = ({ myContract, connectedAcc }) => {
                         <textarea
                             type="text"
                             placeholder="Symptoms"
-                            className="input input-bordered w-full max-w-xs"
+                            className="input input-bordered w-full max-w-xs p-2 rounded-lg mt-3"
                             {...register("symptoms", {
                                 required: {
                                     value: true,
@@ -220,7 +222,7 @@ const AddPatients = ({ myContract, connectedAcc }) => {
                         <label className="label mr-5">
                             <span className="label-text">Vaccine Status</span>
                         </label>
-                        <select defaultValue='None' className="select select-bordered"
+                        <select defaultValue='None' className="select select-bordered p-2 rounded-lg mt-3"
                             {...register("vaccineStatus", {
                                 required: {
                                     value: true,
