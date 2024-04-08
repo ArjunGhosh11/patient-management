@@ -2,10 +2,23 @@
 
 pragma solidity ^0.8.16;
 
-error NotAdmin();
+error PatientNotFound();
+error UserAlreadyExists();
 
 contract PatientManagement {
     address public immutable i_admin;
+    event patientAdded(
+        address indexed _add,
+        uint256 indexed age,
+        string district
+    );
+    event patientUpdated(
+        address indexed _add,
+        uint indexed age,
+        string district,
+        // VaccineStatus vaccineStatus,
+        bool is_dead
+    );
 
     enum VaccineStatus {
         not_vaccinated,
@@ -27,12 +40,12 @@ contract PatientManagement {
 
     address[] public List_Of_Patients;
     address[] public List_Of_Admins;
-    address[] public deceasedPeople;
-    mapping(string => uint256[]) public districtDeath;
-    mapping(string => uint256[]) public districtPatient;
-    mapping(uint256 => Person) public idToPerson;
+    // address[] public deceasedPeople;
+    // mapping(string => uint256[]) public districtDeath;
+    // mapping(string => uint256[]) public districtPatient;
+    // mapping(uint256 => Person) public idToPerson;
     mapping(address => Person) public addressToPerson;
-    mapping(string => uint256) public ageGroupCount;
+    // mapping(string => uint256) public ageGroupCount;
     uint256 public patientCount;
     uint256 public adminCount;
 
@@ -41,17 +54,17 @@ contract PatientManagement {
         patientCount = 0;
         adminCount = 0;
         List_Of_Admins.push(i_admin);
-        idToPerson[patientCount] = Person(
-            i_admin,
-            patientCount,
-            23,
-            "male",
-            VaccineStatus.two_dose,
-            "Tangail",
-            "No SYmptoms",
-            false,
-            true
-        );
+        // idToPerson[patientCount] = Person(
+        //     i_admin,
+        //     patientCount,
+        //     23,
+        //     "male",
+        //     VaccineStatus.two_dose,
+        //     "Tangail",
+        //     "No SYmptoms",
+        //     false,
+        //     true
+        // );
         addressToPerson[i_admin] = Person(
             i_admin,
             patientCount,
@@ -67,26 +80,6 @@ contract PatientManagement {
     function getAddress() public view returns (address) {
         return i_admin;
     }
-    function quickSort(uint256[] memory arr, int256 left, int256 right) public {
-        int256 i = left;
-        int256 j = right;
-        if (i == j) return;
-        uint256 pivot = arr[uint256(left + (right - left) / 2)];
-        while (i <= j) {
-            while (arr[uint256(i)] > pivot) i++;
-            while (pivot > arr[uint256(j)]) j--;
-            if (i <= j) {
-                (arr[uint256(i)], arr[uint256(j)]) = (
-                    arr[uint256(j)],
-                    arr[uint256(i)]
-                );
-                i++;
-                j--;
-            }
-        }
-        if (left < j) quickSort(arr, left, j);
-        if (i < right) quickSort(arr, i, right);
-    }
 
     function addPatient(
         address _add,
@@ -95,20 +88,23 @@ contract PatientManagement {
         VaccineStatus _vaccineStatus,
         string memory _district,
         string memory _symptomsDetails
-    ) public returns (uint256) {
+    ) public {
+        if (addressToPerson[_add].id != 0) {
+            revert UserAlreadyExists();
+        }
         patientCount++;
         List_Of_Patients.push(_add);
-        idToPerson[patientCount] = Person(
-            _add,
-            patientCount,
-            _age,
-            _gender,
-            _vaccineStatus,
-            _district,
-            _symptomsDetails,
-            false,
-            false
-        );
+        // idToPerson[patientCount] = Person(
+        //     _add,
+        //     patientCount,
+        //     _age,
+        //     _gender,
+        //     _vaccineStatus,
+        //     _district,
+        //     _symptomsDetails,
+        //     false,
+        //     false
+        // );
         addressToPerson[_add] = Person(
             _add,
             patientCount,
@@ -120,17 +116,18 @@ contract PatientManagement {
             false,
             false
         );
-        if (_age < 13) {
-            ageGroupCount["children"] += 1;
-        } else if (_age >= 13 && _age < 20) {
-            ageGroupCount["teenager"] += 1;
-        } else if (_age >= 20 && _age < 50) {
-            ageGroupCount["young"] += 1;
-        } else {
-            ageGroupCount["elder"] += 1;
-        }
-        districtPatient[_district].push(patientCount);
-        return patientCount;
+        emit patientAdded(_add, _age, _district);
+        // if (_age < 13) {
+        //     ageGroupCount["children"] += 1;
+        // } else if (_age >= 13 && _age < 20) {
+        //     ageGroupCount["teenager"] += 1;
+        // } else if (_age >= 20 && _age < 50) {
+        //     ageGroupCount["young"] += 1;
+        // } else {
+        //     ageGroupCount["elder"] += 1;
+        // }
+        // districtPatient[_district].push(patientCount);
+        // return patientCount;
     }
 
     function addAdmin(
@@ -140,10 +137,13 @@ contract PatientManagement {
         VaccineStatus _vaccineStatus,
         string memory _district,
         string memory _symptomsDetails
-    ) public onlyadmin returns (uint256) {
+    ) public onlyadmin {
+        if (addressToPerson[_add].id != 0) {
+            revert UserAlreadyExists();
+        }
         adminCount++;
         List_Of_Admins.push(_add);
-        idToPerson[patientCount] = Person(
+        addressToPerson[_add] = Person(
             _add,
             patientCount,
             _age,
@@ -154,38 +154,52 @@ contract PatientManagement {
             false,
             true
         );
-        return adminCount;
+        // return adminCount;
     }
 
-    function getPatientById(uint256 _id) public view returns (Person memory) {
-        return idToPerson[_id];
-    }
-    function getPatientByAddress(
+    // function getPatientById(uint256 _id) public view returns (Person memory) {
+    //     return idToPerson[_id];
+    // }
+    function getUserByAddress(
         address _add
     ) public view returns (Person memory) {
         return addressToPerson[_add];
     }
 
-    function getPatientByDistrict(
-        string memory _district
-    ) public view returns (uint256[] memory) {
-        return districtPatient[_district];
-    }
+    // function getPatientByDistrict(
+    //     string memory _district
+    // ) public view returns (uint256[] memory) {
+    //     return districtPatient[_district];
+    // }
 
-    function getDeadPeopleByDistrict(
-        string memory _district
-    ) public view returns (uint256[] memory) {
-        return districtDeath[_district];
-    }
+    // function getDeadPeopleByDistrict(
+    //     string memory _district
+    // ) public view returns (uint256[] memory) {
+    //     return districtDeath[_district];
+    // }
 
-    function vaccinate(uint256 _id) public onlyadmin returns (string memory) {
-        VaccineStatus currentStatus = idToPerson[_id].vaccine_status;
-
+    function vaccinate(address _add) public onlyadmin returns (string memory) {
+        if (addressToPerson[_add].id == 0) {
+            revert PatientNotFound();
+        }
+        VaccineStatus currentStatus = addressToPerson[_add].vaccine_status;
         if (currentStatus == VaccineStatus.not_vaccinated) {
-            idToPerson[_id].vaccine_status = VaccineStatus.one_dose;
+            addressToPerson[_add].vaccine_status = VaccineStatus.one_dose;
+            emit patientUpdated(
+                _add,
+                addressToPerson[_add].age,
+                addressToPerson[_add].district,
+                addressToPerson[_add].is_dead
+            );
             return "Vaccinated first dose";
         } else if (currentStatus == VaccineStatus.one_dose) {
-            idToPerson[_id].vaccine_status = VaccineStatus.two_dose;
+            addressToPerson[_add].vaccine_status = VaccineStatus.two_dose;
+            emit patientUpdated(
+                _add,
+                addressToPerson[_add].age,
+                addressToPerson[_add].district,
+                addressToPerson[_add].is_dead
+            );
             return "Vaccinated second dose";
         } else {
             return "Already fully vaccinated";
@@ -194,16 +208,43 @@ contract PatientManagement {
 
     function issueDeathCertificate(address _add) public onlyadmin {
         // Check if the person exists
+        if (addressToPerson[_add].id == 0) {
+            revert PatientNotFound();
+        }
         // Update the person's status in the mapping
         addressToPerson[_add].is_dead = true;
-        districtDeath[addressToPerson[_add].district].push(
-            addressToPerson[_add].id
+        emit patientUpdated(
+            _add,
+            addressToPerson[_add].age,
+            addressToPerson[_add].district,
+            addressToPerson[_add].is_dead
         );
-        deceasedPeople.push(_add);
+        // districtDeath[addressToPerson[_add].district].push(
+        //     addressToPerson[_add].id
+        // );
+        // deceasedPeople.push(_add);
+    }
+    function cancelDeathCertificate(address _add) public onlyadmin {
+        // Check if the person exists
+
+        // Update the person's status in the mapping
+        addressToPerson[_add].is_dead = false;
+        emit patientUpdated(
+            _add,
+            addressToPerson[_add].age,
+            addressToPerson[_add].district,
+            addressToPerson[_add].is_dead
+        );
     }
 
     modifier onlyadmin() {
-        require(msg.sender == i_admin, "Not authorized");
+        uint flag = 0;
+        for (uint i; i < List_Of_Admins.length; i++) {
+            if (msg.sender == List_Of_Admins[i]) {
+                flag = 1;
+            }
+        }
+        require(flag == 1, "Not authorized");
         _;
     }
 }
