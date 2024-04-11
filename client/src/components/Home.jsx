@@ -7,6 +7,7 @@ import AdminDashboard from './AdminDashboard';
 import CovidTrends from './CovidTrends/CovidTrends';
 
 const Home = () => {
+
     const [isConnected, setIsConnected] = useState(false);
     const [registerToggle, setRegisterToggle] = useState(false);
     const [connectedAcc, setConnectedAcc] = useState('');
@@ -66,6 +67,9 @@ const Home = () => {
     }, [connectedAcc]);
 
 
+
+
+
     return (
         <div className='px-20 w-full  align-middle flex flex-col text-dark'>
             <h1 className='text-center text-xl font-bold my-10 '>COVID CARE HOSPITAL</h1>
@@ -109,11 +113,12 @@ const Home = () => {
                 }
                 {
                     !userInfo?.is_admin && isConnected ?
-                        <div className='w-60 shadow-xl rounded-xl p-5'>
+                        <div className=' shadow-xl rounded-xl py-5 px-20 lg:mx-40'>
+                            <h1 className='text-md text-center my-5'>PATIENT'S INFO</h1>
                             <h1 className='text-sm my-2'><span className='font-bold'>ID: </span>{userInfo?.id}</h1>
                             <h1 className='text-sm my-2'><span className='font-bold'>AGE: </span>{userInfo?.age}</h1>
                             <h1 className='text-sm my-2'><span className='font-bold'>GENDER: </span>{userInfo?.gender}</h1>
-                            <h1 className='text-sm my-2'><span className='font-bold'>Vaccine Status: </span>{userInfo?.vaccine_status}</h1>
+                            <h1 className='text-sm my-2'><span className='font-bold'>Vaccine Status: </span>{(userInfo?.vaccine_status === '0') ? "Not Vaccinated" : (userInfo?.vaccine_status === '1') ? "First Dose Taken" : "Second Dose Taken"}</h1>
                             <h1 className='text-sm my-2'><span className='font-bold'>SYMPTOMS: </span>{userInfo?.symptoms_details}</h1>
                             <h1 className='text-sm my-2'><span className='font-bold'>STATUS: </span>{userInfo?.is_dead ? "Download Death Certificate" : "NOT DEAD"}</h1>
                         </div> :
@@ -122,7 +127,7 @@ const Home = () => {
             </div>
             {/* COVID TREND SECTION */}
             <div>
-                <CovidTrends></CovidTrends>
+                <CovidTrends myContract={myContract}></CovidTrends>
             </div>
             {/* 
             ADMIN's UPDATE SECTION

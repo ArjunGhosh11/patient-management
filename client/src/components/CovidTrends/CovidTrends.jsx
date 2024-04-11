@@ -1,6 +1,99 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import useDaysFromDate from '../../hooks/useDaysFromDate';
+// import useAllPatient from '../../hooks/useAllPatient';
+import contractData from "../../contracts/PatientManagement.json";
+import Web3 from 'web3';
+import { useStats } from '../../hooks/useStats';
+
 
 const CovidTrends = () => {
+    const [patients, setPatients] = useState([]);
+    const [patientAdded, setPatientAdded] = useState(false);
+    const [patientUpdated, setPatientUpdated] = useState(false);
+    // const [days, setDays] = useState(useDaysFromDate());
+
+
+    const days = useDaysFromDate();
+    // console.log(days);
+    const web3 = new Web3('http://localhost:7545');
+    const myContract = new web3.eth.Contract(contractData.abi, contractData.networks[5777].address);
+    //GETTING ALL STATS
+    const {
+        deathRate,
+        highestPatientDistrict,
+        medianAgeByDistrict,
+        ageGroupPercentages,
+    } = useStats(patients, days);
+    // const stats = useStats(patients, days);
+    // console.log({
+    //     deathRate,
+    //     highestPatientDistrict,
+    //     medianAgeByDistrict,
+    //     ageGroupPercentages,
+    // });
+
+    //GET ALL USERS
+
+    useEffect(() => {
+        async function fetchPatients() {
+            const fetchedPatients = await myContract.methods.getAllPatients().call();
+            setPatients(fetchedPatients);
+            console.log(fetchedPatients);
+        }
+
+        fetchPatients();
+
+        if (patientAdded || patientAdded) {
+            setPatientAdded(false);
+            setPatientUpdated(false);
+        }
+    }, [patientAdded, patientUpdated]);
+    useEffect(() => {
+        const getFutureEvents = async () => {
+            if (myContract) {
+                try {
+                    // Listen for NewPatientAdded events
+                    (myContract.events.patientAdded)({
+                        filter: {}, // You can filter the events here
+                    })
+                        .on("data", (event) => {
+                            console.log("PatientAdded event", event);
+                            setPatientAdded(true);
+                        })
+                        .on("error", console.error);
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        };
+
+        getFutureEvents();
+    }, []);
+    useEffect(() => {
+        const getFutureEvents = async () => {
+            if (myContract) {
+                try {
+                    // Listen for APatientIsUpdated events
+                    (myContract.events.patientUpdated)(
+                        {
+                            filter: {}, // You can filter the events here
+                        }
+                    )
+                        .on("data", (event) => {
+                            console.log("New APatientIsUpdated event", event);
+                            setPatientUpdated(true);
+                        })
+                        .on("error", console.error);
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        };
+
+        getFutureEvents();
+    }, []);
+
+
     return (
         <div className='mb-10 lg:px-40'>
             <h1 className='text-lg font-semibold text-center my-5'>COVID TRENDS</h1>
@@ -23,12 +116,12 @@ const CovidTrends = () => {
                         <tbody>
                             {/* row 1 */}
                             <tr>
-                                <th className='outline'>3</th>
-                                <td className='outline'>Dhaka</td>
-                                <td className='outline'>25</td>
-                                <td className='outline'>25</td>
-                                <td className='outline'>25</td>
-                                <td className='outline'>25</td>
+                                <th className='outline'>{deathRate}</th>
+                                <td className='outline'>{highestPatientDistrict}</td>
+                                <td className='outline'>{ageGroupPercentages?.Children}</td>
+                                <td className='outline'>{ageGroupPercentages?.Teenagers}</td>
+                                <td className='outline'>{ageGroupPercentages?.Young}</td>
+                                <td className='outline'>{ageGroupPercentages?.Elder}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -48,10 +141,17 @@ const CovidTrends = () => {
                         </thead>
                         <tbody>
                             {/* row 1 */}
-                            <tr>
+
+                            {/* <tr>
                                 <th className='outline'>3</th>
                                 <td className='outline'>Dhaka</td>
-                            </tr>
+                            </tr> */}
+                            {Object.entries(medianAgeByDistrict).map(([key, value]) => (
+                                <tr key={key}>
+                                    <th className='outline'>{key}</th>
+                                    <th className='outline'>{value}</th>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>

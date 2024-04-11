@@ -1,31 +1,121 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import AddAdmin from './AddAdmin';
+import { toast } from 'react-toastify';
 const AdminDashboard = ({ myContract, connectedAcc }) => {
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm();
-    const onDeathCerSubmit = data => {
-        console.log(data.add)
+    const [patients, setPatients] = useState([]);
+    const [patientAdded, setPatientAdded] = useState(false);
+    const [patientUpdated, setPatientUpdated] = useState(false);
+    const { register: register1, handleSubmit: handleSubmit1, formState: { errors: errorsForm1 }, reset: reset1 } = useForm();
+    const { register: register2, handleSubmit: handleSubmit2, formState: { errors: errorsForm2 }, reset: reset2 } = useForm();
+    const { register: register3, handleSubmit: handleSubmit3, formState: { errors: errorsForm3 }, reset: reset3 } = useForm();
+
+    // Form submission handlers
+    const onSubmit1 = data => {
+        // console.log('Form 1 data:', data);
+        myContract.methods.issueDeathCertificate(data.issueAdd).send({ from: connectedAcc || "" })
+            .then(() => {
+                toast.success("Death Certificate Issued");
+                reset1()
+            })
+            .catch((err) => {
+                toast.error(err.message);
+            })
     }
-    const onDeathCerCancelSubmit = data => {
-        console.log(data.add)
+    const onSubmit2 = data => {
+        // console.log('Form 2 data:', data);
+        myContract.methods.cancelDeathCertificate(data.cancelAdd).send({ from: connectedAcc || "" })
+            .then(() => {
+                toast.success("Death Certificate Canceled");
+                reset2()
+            })
+            .catch((err) => {
+                toast.error(err.message);
+            })
     }
-    const onVaccinateSubmit = data => {
-        console.log(data.add)
+    const onSubmit3 = data => {
+        myContract.methods.vaccinate(data.vaccineAdd).send({ from: connectedAcc || "" })
+            .then(() => {
+                toast.success("Patient Vaccinated!");
+                reset3()
+            })
+            .catch((err) => {
+                toast.error(err.message);
+            })
     }
+
+
+    //
+
+    useEffect(() => {
+        async function fetchPatients() {
+            const fetchedPatients = await myContract.methods.getAllPatients().call();
+            setPatients(fetchedPatients);
+            console.log(fetchedPatients);
+        }
+
+        fetchPatients();
+
+        if (patientAdded || patientAdded) {
+            setPatientAdded(false);
+            setPatientUpdated(false);
+        }
+    }, [patientAdded, patientUpdated]);
+    useEffect(() => {
+        const getFutureEvents = async () => {
+            if (myContract) {
+                try {
+                    // Listen for NewPatientAdded events
+                    (myContract.events.patientAdded)({
+                        filter: {}, // You can filter the events here
+                    })
+                        .on("data", (event) => {
+                            console.log("PatientAdded event", event);
+                            setPatientAdded(true);
+                        })
+                        .on("error", console.error);
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        };
+
+        getFutureEvents();
+    }, []);
+    useEffect(() => {
+        const getFutureEvents = async () => {
+            if (myContract) {
+                try {
+                    // Listen for APatientIsUpdated events
+                    (myContract.events.patientUpdated)(
+                        {
+                            filter: {}, // You can filter the events here
+                        }
+                    )
+                        .on("data", (event) => {
+                            console.log("New APatientIsUpdated event", event);
+                            setPatientUpdated(true);
+                        })
+                        .on("error", console.error);
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        };
+
+        getFutureEvents();
+    }, []);
+
     return (
 
         <div className='bg-gray-200 shadow-lg p-6 rounded-lg'>
             <h1 className='text-lg font-semibold text-center'>ADMIN DASHBOARD</h1>
             <div className='flex flex-col align-middle justify-center'>
                 <div className='flex justify-between flex-wrap'>
-                    <div className='my-5'>
+                    <div className='my-5 shadow-xl bg-slate-100 p-5 rounded-xl'>
                         <h1 className='text-sm font-semibold'>ISSUE DEATH CERTIFICATE</h1>
                         <div className=''>
-                            <form className='flex flex-col justify-between relative ' onSubmit={handleSubmit(onDeathCerSubmit)}>
+                            <form className='flex flex-col justify-between relative ' onSubmit={handleSubmit1(onSubmit1)}>
                                 <div className="form-control w-full max-w-xs mb-4">
                                     <label className="label my-2">
                                         <span className="label-text">Patient Wallet Address</span>
@@ -34,7 +124,7 @@ const AdminDashboard = ({ myContract, connectedAcc }) => {
                                         type="text"
                                         placeholder="Wallet Address"
                                         className="input input-bordered w-full max-w-xs p-2 rounded-lg mt-3"
-                                        {...register("add", {
+                                        {...register1("issueAdd", {
                                             required: {
                                                 value: true,
                                                 message: 'Address is Required'
@@ -46,7 +136,7 @@ const AdminDashboard = ({ myContract, connectedAcc }) => {
                                         })}
                                     />
                                     <label className="label">
-                                        {errors.add?.type === 'required' && <span className="label-text-alt text-red-500">{errors.add?.message}</span>}
+                                        {errorsForm1.add?.type === 'required' && <span className="label-text-alt text-red-500">{errorsForm1.add?.message}</span>}
                                     </label>
                                 </div>
                                 <input className='bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded w-40 max-w-xs ml-40' type="submit" value="ISSUE" />
@@ -56,10 +146,10 @@ const AdminDashboard = ({ myContract, connectedAcc }) => {
                     {/* 
                     CANCEL DEATH CERTIFICATE
                     */}
-                    <div className='my-5'>
+                    <div className='my-5 shadow-xl bg-slate-100 p-5 rounded-xl'>
                         <h1 className='text-sm font-semibold'>CANCEL DEATH CERTIFICATE</h1>
                         <div className=''>
-                            <form className='flex flex-col justify-between relative' onSubmit={handleSubmit(onDeathCerCancelSubmit)}>
+                            <form className='flex flex-col justify-between relative' onSubmit={handleSubmit2(onSubmit2)}>
                                 <div className="form-control w-full max-w-xs mb-4">
                                     <label className="label my-2">
                                         <span className="label-text">Patient Wallet Address</span>
@@ -68,7 +158,7 @@ const AdminDashboard = ({ myContract, connectedAcc }) => {
                                         type="text"
                                         placeholder="Wallet Address"
                                         className="input input-bordered w-full max-w-xs p-2 rounded-lg mt-3"
-                                        {...register("add", {
+                                        {...register2("cancelAdd", {
                                             required: {
                                                 value: true,
                                                 message: 'Address is Required'
@@ -80,7 +170,7 @@ const AdminDashboard = ({ myContract, connectedAcc }) => {
                                         })}
                                     />
                                     <label className="label">
-                                        {errors.add?.type === 'required' && <span className="label-text-alt text-red-500">{errors.add?.message}</span>}
+                                        {errorsForm2.add?.type === 'required' && <span className="label-text-alt text-red-500">{errorsForm2.add?.message}</span>}
                                     </label>
                                 </div>
                                 <input className='bg-transparent hover:bg-red-500 text-red-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded w-40 max-w-xs ml-40' type="submit" value="CANCEL" />
@@ -91,10 +181,10 @@ const AdminDashboard = ({ myContract, connectedAcc }) => {
                     {/* 
                     VACCINATE PATIENT
                     */}
-                    <div className='my-5'>
+                    <div className='my-5 shadow-xl bg-slate-100 p-5 rounded-xl'>
                         <h1 className='text-sm font-semibold'>VACCINATE PATIENTS</h1>
                         <div className=''>
-                            <form className='flex flex-col justify-between relative' onSubmit={handleSubmit(onVaccinateSubmit)}>
+                            <form className='flex flex-col justify-between relative' onSubmit={handleSubmit3(onSubmit3)}>
                                 <div className="form-control w-full max-w-xs mb-4">
                                     <label className="label my-2">
                                         <span className="label-text">Patient Wallet Address</span>
@@ -103,7 +193,7 @@ const AdminDashboard = ({ myContract, connectedAcc }) => {
                                         type="text"
                                         placeholder="Wallet Address"
                                         className="input input-bordered w-full max-w-xs p-2 rounded-lg mt-3"
-                                        {...register("add", {
+                                        {...register3("vaccineAdd", {
                                             required: {
                                                 value: true,
                                                 message: 'Address is Required'
@@ -115,7 +205,7 @@ const AdminDashboard = ({ myContract, connectedAcc }) => {
                                         })}
                                     />
                                     <label className="label">
-                                        {errors.add?.type === 'required' && <span className="label-text-alt text-red-500">{errors.add?.message}</span>}
+                                        {errorsForm3.add?.type === 'required' && <span className="label-text-alt text-red-500">{errorsForm3.add?.message}</span>}
                                     </label>
                                 </div>
                                 <input className='bg-transparent hover:bg-green-500 text-green-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded w-40 max-w-xs ml-40' type="submit" value="VACCINATE" />
@@ -127,7 +217,7 @@ const AdminDashboard = ({ myContract, connectedAcc }) => {
                 {/* 
                 ADD ADMIN FORM
                 */}
-                <div>
+                <div className='shadow-xl bg-slate-100 p-5 rounded-xl'>
                     <AddAdmin></AddAdmin>
                 </div>
             </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 
 const AddPatients = ({ myContract, connectedAcc }) => {
     // console.log(myContract);
@@ -89,18 +90,21 @@ const AddPatients = ({ myContract, connectedAcc }) => {
         ).send({ from: connectedAcc || "", gas: 6000000 })
             .then(() => {
                 console.log("PATIENT ADDED");
+                toast("PATIENT ADDED!");
                 reset();
             })
             .catch((err) => {
                 console.error(err.message);
+                toast(err.message);
             })
 
     }
     const [value, setValue] = useState({});
     const getValue = async (myContract, connectedAcc) => {
         try {
-            const result = await myContract.methods.getUserByAddress("0xA4DD406D79933459fF762920Da0742f5BEAe0340").call(); // Call your view function
+            const result = await myContract.methods.getUserByAddress("0x07AF2D879a129f15cE8fb0046cD1Ff249770c328").call(); // Call your view function
             console.log(result);
+
             // Update state with the result
         } catch (error) {
             console.error('Error:', error);

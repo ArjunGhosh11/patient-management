@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-
+import { toast } from 'react-toastify';
 const AddAdmin = ({ myContract, connectedAcc }) => {
     const bangladeshDistricts = [
         "Bagerhat",
@@ -87,24 +87,15 @@ const AddAdmin = ({ myContract, connectedAcc }) => {
         ).send({ from: connectedAcc || "", gas: 6000000 })
             .then(() => {
                 console.log("ADMIN ADDED");
+                toast("ADMIN ADDED!");
                 reset();
             })
             .catch((err) => {
                 console.error(err.message);
+                toast(err.message);
             })
 
     }
-    // const [value, setValue] = useState({});
-    // const getValue = async (myContract, connectedAcc) => {
-    //     try {
-    //         const result = await myContract.methods.getPatientById(1).call(); // Call your view function
-    //         console.log(result);
-    //         // Update state with the result
-    //     } catch (error) {
-    //         console.error('Error:', error);
-    //     }
-
-    // }
     return (
         <div className='shadow-xl p-10'>
             <h1 className='text-primary font-semibold text-center'>ADD ADMIN</h1>

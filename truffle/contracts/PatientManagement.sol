@@ -165,7 +165,13 @@ contract PatientManagement {
     ) public view returns (Person memory) {
         return addressToPerson[_add];
     }
-
+    function getAllPatients() public view returns (Person[] memory) {
+        Person[] memory patients = new Person[](List_Of_Patients.length);
+        for (uint256 i = 0; i < List_Of_Patients.length; i++) {
+            patients[i] = addressToPerson[List_Of_Patients[i]];
+        }
+        return patients;
+    }
     // function getPatientByDistrict(
     //     string memory _district
     // ) public view returns (uint256[] memory) {
