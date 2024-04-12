@@ -99,18 +99,7 @@ const AddPatients = ({ myContract, connectedAcc }) => {
             })
 
     }
-    const [value, setValue] = useState({});
-    const getValue = async (myContract, connectedAcc) => {
-        try {
-            const result = await myContract.methods.getUserByAddress("0x07AF2D879a129f15cE8fb0046cD1Ff249770c328").call(); // Call your view function
-            console.log(result);
 
-            // Update state with the result
-        } catch (error) {
-            console.error('Error:', error);
-        }
-
-    }
 
     return (
         <div className='bg-slate-100 shadow-xl rounded-xl p-10 lg:mx-40'>
@@ -242,7 +231,6 @@ const AddPatients = ({ myContract, connectedAcc }) => {
                         </label>
                     </div>
                     <input className='bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded w-full max-w-xs' type="submit" value="SUBMIT" />
-                    <button onClick={() => getValue(myContract, connectedAcc)}>Get Value</button>
                 </form>
             </div>
         </div>

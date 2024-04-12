@@ -40,12 +40,7 @@ contract PatientManagement {
 
     address[] public List_Of_Patients;
     address[] public List_Of_Admins;
-    // address[] public deceasedPeople;
-    // mapping(string => uint256[]) public districtDeath;
-    // mapping(string => uint256[]) public districtPatient;
-    // mapping(uint256 => Person) public idToPerson;
     mapping(address => Person) public addressToPerson;
-    // mapping(string => uint256) public ageGroupCount;
     uint256 public patientCount;
     uint256 public adminCount;
 
@@ -54,17 +49,6 @@ contract PatientManagement {
         patientCount = 0;
         adminCount = 0;
         List_Of_Admins.push(i_admin);
-        // idToPerson[patientCount] = Person(
-        //     i_admin,
-        //     patientCount,
-        //     23,
-        //     "male",
-        //     VaccineStatus.two_dose,
-        //     "Tangail",
-        //     "No SYmptoms",
-        //     false,
-        //     true
-        // );
         addressToPerson[i_admin] = Person(
             i_admin,
             patientCount,
@@ -94,17 +78,6 @@ contract PatientManagement {
         }
         patientCount++;
         List_Of_Patients.push(_add);
-        // idToPerson[patientCount] = Person(
-        //     _add,
-        //     patientCount,
-        //     _age,
-        //     _gender,
-        //     _vaccineStatus,
-        //     _district,
-        //     _symptomsDetails,
-        //     false,
-        //     false
-        // );
         addressToPerson[_add] = Person(
             _add,
             patientCount,
@@ -117,17 +90,6 @@ contract PatientManagement {
             false
         );
         emit patientAdded(_add, _age, _district);
-        // if (_age < 13) {
-        //     ageGroupCount["children"] += 1;
-        // } else if (_age >= 13 && _age < 20) {
-        //     ageGroupCount["teenager"] += 1;
-        // } else if (_age >= 20 && _age < 50) {
-        //     ageGroupCount["young"] += 1;
-        // } else {
-        //     ageGroupCount["elder"] += 1;
-        // }
-        // districtPatient[_district].push(patientCount);
-        // return patientCount;
     }
 
     function addAdmin(
@@ -154,12 +116,7 @@ contract PatientManagement {
             false,
             true
         );
-        // return adminCount;
     }
-
-    // function getPatientById(uint256 _id) public view returns (Person memory) {
-    //     return idToPerson[_id];
-    // }
     function getUserByAddress(
         address _add
     ) public view returns (Person memory) {
@@ -172,17 +129,6 @@ contract PatientManagement {
         }
         return patients;
     }
-    // function getPatientByDistrict(
-    //     string memory _district
-    // ) public view returns (uint256[] memory) {
-    //     return districtPatient[_district];
-    // }
-
-    // function getDeadPeopleByDistrict(
-    //     string memory _district
-    // ) public view returns (uint256[] memory) {
-    //     return districtDeath[_district];
-    // }
 
     function vaccinate(address _add) public onlyadmin returns (string memory) {
         if (addressToPerson[_add].id == 0) {
@@ -225,10 +171,6 @@ contract PatientManagement {
             addressToPerson[_add].district,
             addressToPerson[_add].is_dead
         );
-        // districtDeath[addressToPerson[_add].district].push(
-        //     addressToPerson[_add].id
-        // );
-        // deceasedPeople.push(_add);
     }
     function cancelDeathCertificate(address _add) public onlyadmin {
         // Check if the person exists

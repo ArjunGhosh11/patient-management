@@ -5,6 +5,7 @@ import '../App.css';
 import AddPatients from './AddPatients';
 import AdminDashboard from './AdminDashboard';
 import CovidTrends from './CovidTrends/CovidTrends';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
 
@@ -118,9 +119,9 @@ const Home = () => {
                             <h1 className='text-sm my-2'><span className='font-bold'>ID: </span>{userInfo?.id}</h1>
                             <h1 className='text-sm my-2'><span className='font-bold'>AGE: </span>{userInfo?.age}</h1>
                             <h1 className='text-sm my-2'><span className='font-bold'>GENDER: </span>{userInfo?.gender}</h1>
-                            <h1 className='text-sm my-2'><span className='font-bold'>Vaccine Status: </span>{(userInfo?.vaccine_status === '0') ? "Not Vaccinated" : (userInfo?.vaccine_status === '1') ? "First Dose Taken" : "Second Dose Taken"}</h1>
+                            <h1 className='text-sm my-2'><span className='font-bold'>Vaccine Status: </span>{(userInfo?.vaccine_status === '0') ? "Not Vaccinated" : (userInfo?.vaccine_status === '1') ? "First Dose Taken" : <Link to={'http://localhost:8080/VC/' + userInfo?.add}><button className='bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded'>DOWNLOAD Vaccine CERTIFICATE</button></Link>}</h1>
                             <h1 className='text-sm my-2'><span className='font-bold'>SYMPTOMS: </span>{userInfo?.symptoms_details}</h1>
-                            <h1 className='text-sm my-2'><span className='font-bold'>STATUS: </span>{userInfo?.is_dead ? "Download Death Certificate" : "NOT DEAD"}</h1>
+                            <h1 className='text-sm my-2'><span className='font-bold'>STATUS: </span>{userInfo?.is_dead ? <Link to={'http://localhost:8080/DC/' + userInfo?.add}><button className='bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded'>DOWNLOAD DEATH CERTIFICATE</button></Link> : "NOT DEAD"}</h1>
                         </div> :
                         <p></p>
                 }
