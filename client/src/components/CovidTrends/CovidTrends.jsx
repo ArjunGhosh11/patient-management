@@ -50,43 +50,40 @@ const CovidTrends = () => {
     }, [patientAdded, patientUpdated]);
     useEffect(() => {
         const getFutureEvents = async () => {
-            if (myContract) {
-                try {
-                    // Listen for NewPatientAdded events
-                    (myContract.events.patientAdded)({
-                        filter: {}, // You can filter the events here
+            try {
+                // Listen for NewPatientAdded events
+                (myContract.events.patientAdded)({
+                    filter: {}, // You can filter the events here
+                })
+                    .on("data", (event) => {
+                        console.log("PatientAdded event", event);
+                        setPatientAdded(true);
                     })
-                        .on("data", (event) => {
-                            console.log("PatientAdded event", event);
-                            setPatientAdded(true);
-                        })
-                        .on("error", console.error);
-                } catch (error) {
-                    console.log(error);
-                }
+                    .on("error", console.error);
+            } catch (error) {
+                console.log(error);
             }
-        };
+        }
 
         getFutureEvents();
     }, []);
     useEffect(() => {
         const getFutureEvents = async () => {
-            if (myContract) {
-                try {
-                    // Listen for APatientIsUpdated events
-                    (myContract.events.patientUpdated)(
-                        {
-                            filter: {}, // You can filter the events here
-                        }
-                    )
-                        .on("data", (event) => {
-                            console.log("New APatientIsUpdated event", event);
-                            setPatientUpdated(true);
-                        })
-                        .on("error", console.error);
-                } catch (error) {
-                    console.log(error);
-                }
+
+            try {
+                // Listen for APatientIsUpdated events
+                (myContract.events.patientUpdated)(
+                    {
+                        filter: {}, // You can filter the events here
+                    }
+                )
+                    .on("data", (event) => {
+                        console.log("New APatientIsUpdated event", event);
+                        setPatientUpdated(true);
+                    })
+                    .on("error", console.error);
+            } catch (error) {
+                console.log(error);
             }
         };
 
