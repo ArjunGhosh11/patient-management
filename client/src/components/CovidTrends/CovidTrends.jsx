@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import useDaysFromDate from '../../hooks/useDaysFromDate';
-// import useAllPatient from '../../hooks/useAllPatient';
 import contractData from "../../contracts/PatientManagement.json";
 import Web3 from 'web3';
 import { useStats } from '../../hooks/useStats';
@@ -25,64 +24,6 @@ const CovidTrends = () => {
         medianAgeByDistrict,
         ageGroupPercentages,
     } = useStats(patients, days);
-
-    //GET ALL USERS
-
-    // useEffect(() => {
-    //     async function fetchPatients() {
-    //         const fetchedPatients = await myContract.methods.getAllPatients().call();
-    //         setPatients(fetchedPatients);
-    //         console.log(fetchedPatients);
-    //     }
-
-    //     fetchPatients();
-
-    //     if (patientAdded || patientAdded) {
-    //         setPatientAdded(false);
-    //         setPatientUpdated(false);
-    //     }
-    // }, [patientAdded, patientUpdated]);
-    // useEffect(() => {
-    //     const getFutureEvents = async () => {
-    //         try {
-    //             // Listen for NewPatientAdded events
-    //             (myContract.events.patientAdded)({
-    //                 filter: {}, // You can filter the events here
-    //             })
-    //                 .on("data", (event) => {
-    //                     console.log("PatientAdded event", event);
-    //                     setPatientAdded(true);
-    //                 })
-    //                 .on("error", console.error);
-    //         } catch (error) {
-    //             console.log(error);
-    //         }
-    //     }
-
-    //     getFutureEvents();
-    // }, []);
-    // useEffect(() => {
-    //     const getFutureEvents = async () => {
-
-    //         try {
-    //             // Listen for APatientIsUpdated events
-    //             (myContract.events.patientUpdated)(
-    //                 {
-    //                     filter: {}, // You can filter the events here
-    //                 }
-    //             )
-    //                 .on("data", (event) => {
-    //                     console.log("New APatientIsUpdated event", event);
-    //                     setPatientUpdated(true);
-    //                 })
-    //                 .on("error", console.error);
-    //         } catch (error) {
-    //             console.log(error);
-    //         }
-    //     };
-
-    //     getFutureEvents();
-    // }, []);
 
     useEffect(() => {
         async function fetchPatients() {
